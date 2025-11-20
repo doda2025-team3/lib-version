@@ -1,0 +1,46 @@
+name: Prerelease
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  prerelease:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN_DANIEL }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '20'
+          distribution: 'temurin'
+
+      - name: Compute pre-release version
+        id: prerelease
+        run: |
+            BASE=$(sed -n 's:.*<version>\(.*\)</version>.*:\1:p' pom.xml | head -1 | sed 's/-SNAPSHOT//')
+            SAFE_BRANCH=${GITHUB_REF_NAME//\//-}
+            UNIQUE=$(date +'%Y%m%d%H%M%S')
+            PRERELEASE="${BASE}-${SAFE_BRANCH}-${UNIQUE}"
+            echo "Computed pre-release version: $PRERELEASE"
+            echo "pre_version=$PRERELEASE" >> "$GITHUB_OUTPUT"
+
+      - name: Set pre-release version in pom.xml
+        run: |
+          mvn -B versions:set -DnewVersion=${{ steps.prerelease.outputs.pre_version }} -DgenerateBackupPoms=false
+
+      - name: Build and deploy pre-release
+        run: |
+          mvn -B clean deploy -DskipTests \
+            -DaltDeploymentRepository=github::https://maven.pkg.github.com/doda2025-team3/lib-version
