@@ -30,9 +30,9 @@ jobs:
         id: prerelease
         run: |
             BASE=$(sed -n 's:.*<version>\(.*\)</version>.*:\1:p' pom.xml | head -1 | sed 's/-SNAPSHOT//')
-            SAFE_BRANCH=${GITHUB_REF_NAME//\//-}
+            BRANCH=${GITHUB_REF_NAME//\//-}
             UNIQUE=$(date +'%Y%m%d%H%M%S')
-            PRERELEASE="${BASE}-${SAFE_BRANCH}-${UNIQUE}"
+            PRERELEASE="${BASE}-${BRANCH}-${UNIQUE}"
             echo "Computed pre-release version: $PRERELEASE"
             echo "pre_version=$PRERELEASE" >> "$GITHUB_OUTPUT"
 
@@ -43,4 +43,6 @@ jobs:
       - name: Build and deploy pre-release
         run: |
           mvn -B clean deploy -DskipTests \
-            -DaltDeploymentRepository=github::https://maven.pkg.github.com/doda2025-team3/lib-version
+            -DaltDeploymentRepository=github::https://maven.pkg.github.com/doda2025-team3/lib-version \
+            -Dusername=${{ github.actor }} \
+            -Dpassword=${{ secrets.GH_TOKEN_DANIEL }}
