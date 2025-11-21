@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -56,7 +58,7 @@ jobs:
 
       - name: Tag prerelease
         run: |
-          TAG="pre-${BRANCH}-${UNIQUE}"
+          TAG="pre-${BRANCH}-${UNIQUE}-${SHA}"
           git tag $TAG
           git push origin $TAG
 
