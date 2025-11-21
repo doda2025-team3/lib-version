@@ -44,8 +44,23 @@ jobs:
       - name: Set pre-release version in pom.xml
         run: |
           mvn -B versions:set -DnewVersion=${{ steps.prerelease.outputs.pre_version }} -DgenerateBackupPoms=false
+          mvn -B versions:commit
+          
+      - name: Commit updated prerelease version
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add pom.xml
+          git commit -m "chore: update pre-release version to ${{ steps.prerelease.outputs.pre_version }}" || echo "No changes to commit"
+          git push origin HEAD:${GITHUB_REF_NAME}
 
-      - name: Build & deploy prerelease
+      - name: Tag prerelease
+        run: |
+          TAG="pre-${BRANCH}-${UNIQUE}"
+          git tag $TAG
+          git push origin $TAG
+
+      - name: Build and deploy prerelease
         run: mvn -B clean deploy -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN_IEVA }}
