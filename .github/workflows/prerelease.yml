@@ -41,6 +41,9 @@ jobs:
             SHA=$(git rev-parse --short HEAD)
             PRERELEASE="${BASE}-${BRANCH}-${UNIQUE}-${SHA}"
             echo "pre_version=$PRERELEASE" >> $GITHUB_OUTPUT
+            echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+            echo "unique=$UNIQUE" >> $GITHUB_OUTPUT
+            echo "sha=$SHA" >> $GITHUB_OUTPUT
             echo "Computed prerelease version: $PRERELEASE"
 
       - name: Set pre-release version in pom.xml
@@ -58,7 +61,7 @@ jobs:
 
       - name: Tag prerelease
         run: |
-          TAG="pre-${BRANCH}-${UNIQUE}-${SHA}"
+          TAG="pre-${{ steps.prerelease.outputs.branch }}-${{ steps.prerelease.outputs.unique }}-${{ steps.prerelease.outputs.sha }}"
           git tag $TAG
           git push origin $TAG
 
