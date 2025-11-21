@@ -36,6 +36,7 @@ jobs:
         run: |
             BASE=$(mvn -q -DforceStdout -Dexpression=project.version help:evaluate)
             BASE=${BASE%-SNAPSHOT}
+            BASE=${BASE%%-*}
             BRANCH=${GITHUB_REF_NAME//\//-}
             UNIQUE=$(date +'%Y%m%d%H%M%S')
             SHA=$(git rev-parse --short HEAD)
