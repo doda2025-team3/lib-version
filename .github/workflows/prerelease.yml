@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          ref: ${{ githib.ref_name }}
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -60,9 +61,10 @@ jobs:
           git commit -m "chore: update pre-release version to ${{ steps.prerelease.outputs.pre_version }}" || echo "No changes to commit"
           git push origin HEAD:${GITHUB_REF_NAME}
 
-      - name: Tag prerelease
+      - name: Tag prerelease (tag matches version in pom)
         run: |
-          TAG="pre-${{ steps.prerelease.outputs.branch }}-${{ steps.prerelease.outputs.unique }}-${{ steps.prerelease.outputs.sha }}"
+          # TAG="pre-${{ steps.prerelease.outputs.branch }}-${{ steps.prerelease.outputs.unique }}-${{ steps.prerelease.outputs.sha }}"
+          TAG="pre-${{ steps.prerelease.outputs.pre_version }}
           git tag $TAG
           git push origin $TAG
 
