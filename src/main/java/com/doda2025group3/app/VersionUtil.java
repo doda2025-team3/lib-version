@@ -17,7 +17,7 @@ public class VersionUtil {
         Properties prop = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(".properties")){
             if (input==null){
-                throw new IllegalStateException("Missing resource: " + ".properties")
+                throw new IllegalStateException("Missing resource: " + ".properties");
             }
             prop.load(input);
             return prop;
