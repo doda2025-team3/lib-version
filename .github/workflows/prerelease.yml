@@ -51,7 +51,7 @@ jobs:
 
       - name: Set pre-release version in pom.xml
         run: |
-          mvn -B versions:set -DnewVersion="${{ steps.prerelease.outputs.pre_version }}"" -DgenerateBackupPoms=false
+          mvn -B versions:set -DnewVersion="${{ steps.prerelease.outputs.pre_version }}" -DgenerateBackupPoms=false
           mvn -B versions:commit
           
       - name: Commit updated prerelease version
