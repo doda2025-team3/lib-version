@@ -2,6 +2,7 @@ package com.doda2025group3.app;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.io.InputStream;
 
 // Part of F1: Create a Version-aware library
 // This class can be asked for the version
