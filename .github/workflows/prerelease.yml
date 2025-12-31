@@ -64,7 +64,7 @@ jobs:
       - name: Tag prerelease (tag matches version in pom)
         run: |
           # TAG="pre-${{ steps.prerelease.outputs.branch }}-${{ steps.prerelease.outputs.unique }}-${{ steps.prerelease.outputs.sha }}"
-          TAG="pre-${{ steps.prerelease.outputs.pre_version }}
+          TAG="pre-${{ steps.prerelease.outputs.pre_version }}"
           git tag $TAG
           git push origin $TAG
 
