@@ -61,6 +61,17 @@ jobs:
           mvn -B versions:set -DnewVersion="${{ steps.release.outputs.release }}" -DgenerateBackupPoms=false
           mvn -B versions:commit
 
+      - name: Verify versions match between pom.xml and release
+        run: |
+          POM=$(mvn -q -DforceStdout -Dexpression=project.version help:evaluate)
+
+          if [ "$POM" != "${{ steps.release.outputs.release }}" ]; then
+            echo "ERROR: pom.xml version ($POM) does not match release version (${{ steps.release.outputs.release }})"
+            exit 1
+          fi
+
+          echo "Verified pom.xml version matches release version!"
+
       - name: Commit the release version
         run: |
           git config user.name "github-actions"
