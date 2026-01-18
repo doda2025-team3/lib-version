@@ -7,6 +7,7 @@ on:
 
 jobs:
   prerelease:
+    if: "!contains(github.event.head_commit.message, '[skip prerelease]')"
     runs-on: ubuntu-latest
 
     permissions:
@@ -18,9 +19,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.ref_name }}
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -38,7 +40,7 @@ jobs:
             BASE=${BASE%-SNAPSHOT}
             BASE=${BASE%%-*}
             BRANCH=${GITHUB_REF_NAME//\//-}
-            UNIQUE=$(date +'%Y%m%d%H%M%S')
+            UNIQUE=${GITHUB_RUN_NUMBER}
             SHA=$(git rev-parse --short HEAD)
             PRERELEASE="${BASE}-${BRANCH}-${UNIQUE}-${SHA}"
             echo "pre_version=$PRERELEASE" >> $GITHUB_OUTPUT
@@ -49,7 +51,7 @@ jobs:
 
       - name: Set pre-release version in pom.xml
         run: |
-          mvn -B versions:set -DnewVersion=${{ steps.prerelease.outputs.pre_version }} -DgenerateBackupPoms=false
+          mvn -B versions:set -DnewVersion="${{ steps.prerelease.outputs.pre_version }}" -DgenerateBackupPoms=false
           mvn -B versions:commit
           
       - name: Commit updated prerelease version
@@ -57,14 +59,15 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add pom.xml
-          git commit -m "chore: update pre-release version to ${{ steps.prerelease.outputs.pre_version }}" || echo "No changes to commit"
+          git commit -m "chore: update pre-release version to ${{ steps.prerelease.outputs.pre_version }} [skip prerelease]" || echo "No changes to commit"
           git push origin HEAD:${GITHUB_REF_NAME}
 
-      - name: Tag prerelease
+      - name: Tag prerelease (tag matches version in pom)
         run: |
-          TAG="pre-${{ steps.prerelease.outputs.branch }}-${{ steps.prerelease.outputs.unique }}-${{ steps.prerelease.outputs.sha }}"
-          git tag $TAG
-          git push origin $TAG
+          # TAG="pre-${{ steps.prerelease.outputs.branch }}-${{ steps.prerelease.outputs.unique }}-${{ steps.prerelease.outputs.sha }}"
+          TAG="pre-${{ steps.prerelease.outputs.pre_version }}"
+          git tag "$TAG"
+          git push origin "$TAG"
 
       - name: Build and deploy prerelease
         run: mvn -B clean deploy -DskipTests
