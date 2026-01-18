@@ -1,6 +1,11 @@
 name: Publish package to GitHub Packages (Stable)
 
 on:
+  push:
+    branches:
+      - main
+    paths: 
+      - "pom.xml"
   workflow_dispatch:
 
 jobs:
