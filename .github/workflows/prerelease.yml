@@ -40,7 +40,7 @@ jobs:
             BASE=${BASE%-SNAPSHOT}
             BASE=${BASE%%-*}
             BRANCH=${GITHUB_REF_NAME//\//-}
-            UNIQUE=${GITHUB_RUN_NUMBER}
+            UNIQUE=${date +'%Y%m%d%H%M%S'}
             SHA=$(git rev-parse --short HEAD)
             PRERELEASE="${BASE}-${BRANCH}-${UNIQUE}-${SHA}"
             echo "pre_version=$PRERELEASE" >> $GITHUB_OUTPUT
