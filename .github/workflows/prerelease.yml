@@ -51,7 +51,7 @@ jobs:
 
       - name: Stamp version for this build (we do not commit - messy)
         run: |
-          mvn -B versions:set -DnewVersion="${{ steps.prerelease.outputs.pre_version }}" -DgenerateBackupPoms=false
+          # mvn -B versions:set -DnewVersion="${{ steps.prerelease.outputs.pre_version }}" -DgenerateBackupPoms=false
           mvn -B versions:commit
 
       - name: Build and deploy prerelease
